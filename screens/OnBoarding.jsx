@@ -11,7 +11,7 @@ const OnBoarding = () => {
     const navigation = useNavigation();
 
     const handleGetStarted = () => {
-        navigation.navigate('MainApp');
+        navigation.navigate('AuthScreen');
     };
 
     console.log("OnBoarding component rendering");

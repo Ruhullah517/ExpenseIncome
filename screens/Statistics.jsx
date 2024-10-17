@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import SaveIcon from '../assets/Icons/saveIcon.svg';
 import SortIcon from '../assets/Icons/sortIcon.svg';
+import { useNavigation } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -51,7 +52,7 @@ export default function StatisticsPage() {
   const [chartData, setChartData] = useState(null);
   const [transactions, setTransactions] = useState(mockTransactions.Expense);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-
+  const navigation = useNavigation();
   const chartWidth = screenWidth;
 
   useEffect(() => {
@@ -77,7 +78,9 @@ export default function StatisticsPage() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="chevron-back" size={22} color="black" />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={22} color="black" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Statistics</Text>
         <SaveIcon />
       </View>

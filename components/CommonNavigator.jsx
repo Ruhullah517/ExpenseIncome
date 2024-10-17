@@ -4,20 +4,22 @@ import Statistics from '../screens/Statistics';
 import BottomNavBar from './BottomNavbar';
 import Profile from '../screens/Profile';
 import AddExpense from '../screens/AddExpense';
+import AuthScreen from '../screens/authScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 
 
+const Tab = createBottomTabNavigator();
 
-
-const Stack = createStackNavigator();
 export default function CommonStackNavigator({ initialRoute }) {
-    return (<>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
-            <Stack.Screen name="Home" component={Home} />
-             <Stack.Screen name="Statistics" component={Statistics} />
-            <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="AddExpense" component={AddExpense} />
-        </Stack.Navigator>
-        <BottomNavBar />
-    </>
+    const navigation = useNavigation();
+    return (
+        <Tab.Navigator screenOptions={{ headerShown: false }} tabBar={props => <BottomNavBar {...props} state={props.navigation.getState()} />} >
+            <Tab.Screen name="Home" component={Home} />
+            <Tab.Screen name="Statistics" component={Statistics} />
+            <Tab.Screen name="Profile" component={Profile} />
+            <Tab.Screen name="AddExpense" component={AddExpense} />
+            {/* <Tab.Screen name="AuthScreen" component={AuthScreen} /> */}
+        </Tab.Navigator >
     );
-}
+};

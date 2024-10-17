@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions, TextInput, Modal, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions, TextInput, Modal, FlatList, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,40 +7,23 @@ import Ellipse9 from '../assets/Ellipse 9.svg';
 import Ellipse8 from '../assets/Ellipse 8.svg';
 import Ellipse7 from '../assets/Ellipse 7.svg';
 import Calendar from 'react-native-calendars/src/calendar';
+import { useNavigation } from '@react-navigation/native';
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 
 export default function AddExpense() {
     const [date, setDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
-    const [selectedItem, setSelectedItem] = useState({ name: 'Netflix', logo: require('../assets/netflix.png') });
-    const [showDropdown, setShowDropdown] = useState(false);
-
-    const dropdownItems = [
-        { name: 'Netflix', logo: require('../assets/netflix.png') },
-        { name: 'Spotify', logo: require('../assets/netflix.png') },
-        { name: 'Amazon', logo: require('../assets/netflix.png') },
-        // Add more items as needed
-    ];
-
-    const renderDropdownItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.dropdownItem}
-            onPress={() => {
-                setSelectedItem(item);
-                setShowDropdown(false);
-            }}
-        >
-            <View style={styles.logoContainer}>
-                <Image source={item.logo} style={styles.logo} />
-            </View>
-            <Text style={styles.dropdownItemText}>{item.name}</Text>
-        </TouchableOpacity>
-    );
+    const [amount, setAmount] = useState(''); // State to track the amount
+    const [name, setName] = useState(''); // State to track the name
+    const navigation = useNavigation();
 
     const onDateSelect = (day) => {
         setDate(new Date(day.dateString));
         setShowCalendar(false);
+    };
+    const addExpense = () => {
+        console.log("name: ", name, "amount: ", amount, "date: ", date)
     };
 
     return (
@@ -56,7 +39,7 @@ export default function AddExpense() {
                 <Ellipse8 style={styles.ellipse8} />
                 <Ellipse7 style={styles.ellipse7} />
                 <View style={styles.header}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Ionicons name="chevron-back" size={24} color="white" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Add Expense</Text>
@@ -68,19 +51,25 @@ export default function AddExpense() {
             <View style={styles.card}>
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>NAME</Text>
-                    <TouchableOpacity style={styles.input} onPress={() => setShowDropdown(true)}>
-                        <View style={styles.logoContainer}>
-                            <Image source={selectedItem.logo} style={styles.logo} />
-                        </View>
-                        <Text style={styles.inputText}>{selectedItem.name}</Text>
-                        <Ionicons name="chevron-down" size={20} color="#ccc" />
-                    </TouchableOpacity>
+                    <View style={styles.input}>
+
+                        <TextInput
+                            style={styles.inputText}
+                            placeholder="XYZ"
+                            value={name}
+                            onChangeText={setName} />
+                    </View>
                 </View>
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>AMOUNT</Text>
                     <View style={styles.input}>
-                        <TextInput style={styles.inputText} placeholder="$ 48.00" />
-                        <TouchableOpacity>
+                        <TextInput
+                            style={styles.inputText}
+                            placeholder="0.00"
+                            keyboardType='numeric'
+                            value={amount}
+                            onChangeText={setAmount} />
+                        <TouchableOpacity onPress={() => setAmount('')}>
                             <Text style={styles.clearButton}>Clear</Text>
                         </TouchableOpacity>
                     </View>
@@ -101,27 +90,21 @@ export default function AddExpense() {
                         </View>
                     </TouchableOpacity>
                 </View>
+                <View style={styles.btnContainer}>
+                    <TouchableOpacity onPress={() => addExpense()}>
+                        <LinearGradient
+
+                            colors={['#69AEA9', '#3F8782']} // Specify the start and end colors
+                            start={{ x: 0.5, y: -0.17 }}    // Gradient direction (similar to 180deg)
+                            end={{ x: 0.5, y: 1.23 }}
+                            style={styles.button}      // Corresponding to the given gradient stops
+                        >
+                            <Text style={styles.buttonText}>Add expense</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <Modal
-                visible={showDropdown}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setShowDropdown(false)}
-            >
-                <TouchableOpacity
-                    style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPress={() => setShowDropdown(false)}
-                >
-                    <View style={styles.dropdownList}>
-                        <FlatList
-                            data={dropdownItems}
-                            renderItem={renderDropdownItem}
-                            keyExtractor={(item) => item.name}
-                        />
-                    </View>
-                </TouchableOpacity>
-            </Modal>
+
             {/* Calendar Modal */}
             <Modal
                 visible={showCalendar}
@@ -276,7 +259,7 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 5,
         // Add shadow properties
-       
+
     },
     clearButton: {
         color: '#2ecc71',
@@ -327,5 +310,35 @@ const styles = StyleSheet.create({
         padding: 10,
         width: '90%',
         maxHeight: 400,
+    },
+    btnContainer: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    button: {
+        width: windowWidth * 0.5,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderRadius: 30,
+        marginVertical: 20,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#3b9c8b',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            },
+            android: {
+                elevation: 13,
+                backgroundColor: '#16b799', // or any base color of your button
+                shadowColor: '#16b799',
+            },
+        }),
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontFamily: 'InterSemiBold',
+        textAlign: 'center',
     },
 });

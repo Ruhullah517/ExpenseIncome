@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ellipse9 from '../assets/Ellipse 9.svg';
@@ -13,38 +13,17 @@ import DualUser from '../assets/Icons/DualUserIcon.svg';
 import MessageIcon from '../assets/Icons/messageIcon.svg';
 import LockIcon from '../assets/Icons/LockIcon.svg';
 import SecureIcon from '../assets/Icons/SecureIcon.svg';
+import LogoutIcon from '../assets/Icons/logout.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from 'react';
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 
-const menuData = [
-    {
-        title: "Invite Friends",
-
-    },
-    {
-        title: "Account info",
-        icon: "UserFillIcon"
-    },
-    {
-        title: "Personal profile",
-        icon: "DualUser"
-    },
-    {
-        title: "Message center",
-        icon: "MessageIcon"
-    },
-    {
-        title: "Login and security",
-        icon: "LockIcon"
-    },
-    {
-        title: "Data and privacy",
-        icon: "SecureIcon"
-    }
-]
-
-const MenuItem = ({ icon, title }) => (
-    <TouchableOpacity style={title === "Invite Friends" ? styles.menuItem1 : styles.menuItem}>
+const MenuItem = ({ icon, title, onPress }) => (
+    <TouchableOpacity style={title === "Invite Friends" ? styles.menuItem1 : styles.menuItem} onPress={onPress} >
         {title === "Invite Friends" ? (
             <View style={styles.iconBack1}><Image source={GlossyIcon} style={styles.glossyIcon} /></View>
         ) : icon === "UserFillIcon" ? (
@@ -57,17 +36,121 @@ const MenuItem = ({ icon, title }) => (
             <View style={styles.iconBack}><LockIcon width={24} height={24} /></View>
         ) : icon === "SecureIcon" ? (
             <View style={styles.iconBack}><SecureIcon width={24} height={24} /></View>
-        ) : null}
+        ) : icon === "LogoutIcon" ? (
+            <View style={styles.iconBack}><LogoutIcon width={24} height={24} /></View>
+        ) : null
+        }
         <Text style={styles.menuItemText}>{title}</Text>
     </TouchableOpacity>
 );
 
 const Profile = () => {
+    const [userName, setUserName] = useState('');
+    const navigation = useNavigation();
+
     const [loaded] = useFonts({
         InterMedium: require('../assets/fonts/Inter 24pt Medium.ttf'),
         InterSemiBold: require('../assets/fonts/Inter 24pt SemiBold.ttf'),
     });
+    const handleLogout = () => {
+        try {
+            Alert.alert(
+                'Logout',
+                'Are You Sure?',
+                [{
+                    text: 'Cancel',
+                    onPress: () => null,
+                    style: 'cancel'
+                },
+                {
+                    text: 'Logout',
+                    onPress: async () => {
+                        await AsyncStorage.removeItem('token');  // Remove the token from AsyncStorage
+                        navigation.navigate('AuthScreen');
+                    }
+                }]);
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    };
 
+    useEffect(() => {
+        fetchUserDetails();
+    }, []);
+
+    const fetchUserDetails = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            console.log("Token found:", token);  // Debugging log
+
+            if (token) {
+                const decoded = jwtDecode(token);  // Ensure jwtDecode is working correctly
+                const userId = decoded.id;
+                console.log("Decoded userId:", userId);  // Debugging log
+
+                const response = await axios.get(`http://192.168.137.1:3000/users/${userId}`);
+                console.log("User data fetched:", response.data);  // Debugging log
+
+                setUserName(response.data.name);
+            } else {
+                console.log('No token found in storage');
+            }
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
+    };
+    const menuData = [
+        {
+            title: "Invite Friends",
+            onPress: () => console.log("")
+
+
+        },
+        {
+            title: "Account info",
+            icon: "UserFillIcon",
+            onPress: () => console.log("")
+
+
+        },
+        {
+            title: "Personal profile",
+            icon: "DualUser",
+            onPress: () => console.log("")
+
+
+        },
+        {
+            title: "Message center",
+            icon: "MessageIcon",
+            onPress: () => console.log("")
+
+        },
+        {
+            title: "Login and security",
+            icon: "LockIcon",
+            onPress: () => console.log("")
+
+        },
+        {
+            title: "Data and privacy",
+            icon: "SecureIcon",
+            onPress: () => console.log("")
+
+        },
+        {
+            title: "Logout",
+            icon: "LogoutIcon",
+            onPress: () => handleLogout()
+
+        },
+        {
+            title: "Data and privacy",
+            icon: "SecureIcon",
+            onPress: () => console.log("")
+
+        }
+    ];
 
     if (!loaded) {
         return null;
@@ -86,7 +169,7 @@ const Profile = () => {
                     <Ellipse8 style={styles.ellipse8} />
                     <Ellipse7 style={styles.ellipse7} />
                     <View style={styles.header}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Ionicons name="chevron-back" size={22} color="white" />
                         </TouchableOpacity>
                         <Text style={styles.headerTitle}>Profile</Text>
@@ -105,12 +188,12 @@ const Profile = () => {
                     </View>
                 </LinearGradient>
                 <View style={styles.nameContainer}>
-                    <Text style={styles.name}>Enjelin Morgeana</Text>
-                    <Text style={styles.username}>@enjelin_morgeana</Text>
+                    <Text style={styles.name}>{userName}</Text>
+                    <Text style={styles.username}>@{userName}</Text>
                 </View>
                 <View style={styles.menuSection}>
                     {menuData.map((item, index) => (
-                        <MenuItem key={index} title={item.title} icon={item.icon} />
+                        <MenuItem key={index} title={item.title} icon={item.icon} onPress={item.onPress} />
                     ))}
                 </View>
             </View>

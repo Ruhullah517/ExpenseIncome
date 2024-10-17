@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import HomeIcon from '../assets/Icons/HomeIcon.svg';
 import StatsIcon from '../assets/Icons/StatsIcon.svg';
 import AddIcon from '../assets/Icons/addIcon.svg';
@@ -10,9 +10,16 @@ import HomeFillIcon from '../assets/Icons/homeFill.svg';
 import StatsFillIcon from '../assets/Icons/bar-chart-fill 1.svg';
 import ProfileFillIcon from '../assets/Icons/user-fill 1.svg';
 
-const BottomNavBar = () => {
+const BottomNavBar = ({ state }) => {
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('Home');
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const currentRoute = state.routes[state.index].name; // Get the current route name
+      setActiveTab(currentRoute); // Update activeTab based on current route
+    }, [state])
+  );
 
   const navigateAndSetActive = (screenName) => {
     setActiveTab(screenName);
