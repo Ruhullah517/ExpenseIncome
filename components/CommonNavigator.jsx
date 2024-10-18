@@ -7,6 +7,7 @@ import AddExpense from '../screens/AddExpense';
 import AuthScreen from '../screens/authScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
 
 
 const Tab = createBottomTabNavigator();
@@ -19,7 +20,6 @@ export default function CommonStackNavigator({ initialRoute }) {
             <Tab.Screen name="Statistics" component={Statistics} />
             <Tab.Screen name="Profile" component={Profile} />
             <Tab.Screen name="AddExpense" component={AddExpense} />
-            {/* <Tab.Screen name="AuthScreen" component={AuthScreen} /> */}
         </Tab.Navigator >
     );
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions, TextInput, Modal, FlatList, Platform } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions, TextInput, Modal, FlatList, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,22 +8,98 @@ import Ellipse8 from '../assets/Ellipse 8.svg';
 import Ellipse7 from '../assets/Ellipse 7.svg';
 import Calendar from 'react-native-calendars/src/calendar';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+import { UserContext } from '../components/context';
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 
 export default function AddExpense() {
+    const { currentUser } = useContext(UserContext);
     const [date, setDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
     const [amount, setAmount] = useState(''); // State to track the amount
     const [name, setName] = useState(''); // State to track the name
     const navigation = useNavigation();
+    const [selectedImage, setSelectedImage] = useState(null);
 
+    // Function to handle image picking
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true, // Allow editing
+            aspect: [4, 3], // Aspect ratio
+            quality: 1, // Image quality
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            // For edited images, result.assets[0].uri contains the image path
+            setSelectedImage(result.assets[0].uri); // Set the selected image URI
+        }
+    };
     const onDateSelect = (day) => {
         setDate(new Date(day.dateString));
         setShowCalendar(false);
     };
-    const addExpense = () => {
-        console.log("name: ", name, "amount: ", amount, "date: ", date)
+    const addExpense = async () => {
+        if (!name || !amount || !date || !selectedImage) {
+            alert("Please fill in all fields and add an image.");
+            return;
+        }
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('amount', amount);
+        // Format the date to 'YYYY-MM-DD' string before appending
+        const formattedDate = date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+        formData.append('date', formattedDate);
+        formData.append('type', 'expense'); 
+        formData.append('created_by', currentUser.userId);  
+        // Get the file extension from the selected image URI
+        const fileType = selectedImage.split('.').pop(); // Extracts the file extension (either jpg or png)
+        // Set the MIME type dynamically based on the file type
+        const mimeType = fileType === 'png' ? 'image/png' : 'image/jpeg';
+        // Set the file name dynamically as well
+        const fileName = `expense_image.${fileType}`;
+        // Append the image file
+        formData.append('image', {
+            uri: Platform.OS === 'android' ? selectedImage : selectedImage.replace(/^file:\/\//, ''),
+            name: fileName,
+            type: mimeType,
+        });
+        console.log(formData);
+        try {
+            const response = await axios.post('http://192.168.137.1:3000/add-expense', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log(formData);
+
+            if (response.status === 200) {
+                // Clear form fields after successful submission
+                setName('');
+                setAmount('');
+                setDate(new Date());
+                setSelectedImage(null);
+                Alert.alert('Success', 'Expense added successfully!');
+            } else {
+                Alert.alert('Error', 'Failed to add expense');
+            }
+        } catch (error) {
+            if (error.response) {
+                // Server responded with a status code out of the range 2xx
+                console.log('Error Response Data:', error.response.data);
+                console.log('Error Response Status:', error.response.status);
+                console.log('Error Response Headers:', error.response.headers);
+            } else if (error.request) {
+                // Request was made, but no response was received
+                console.log('Error Request:', error.request);
+            } else {
+                // Something happened while setting up the request
+                console.log('Error Message:', error.message);
+            }
+            console.log('Error Config:', error.config);
+        }
     };
 
     return (
@@ -83,15 +159,19 @@ export default function AddExpense() {
                 </View>
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>INVOICE</Text>
-                    <TouchableOpacity style={styles.addInvoice}>
+                    <TouchableOpacity style={styles.addInvoice} onPress={pickImage}>
                         <View style={styles.addInvoiceContainer}>
                             <Ionicons name="add-circle" size={24} color="rgba(102, 102, 102, 1)" />
                             <Text style={styles.addInvoiceText}>Add Invoice</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
+                {/* Display the selected image if there is one */}
+                {selectedImage && (
+                    <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+                )}
                 <View style={styles.btnContainer}>
-                    <TouchableOpacity onPress={() => addExpense()}>
+                    <TouchableOpacity onPress={addExpense}>
                         <LinearGradient
 
                             colors={['#69AEA9', '#3F8782']} // Specify the start and end colors
@@ -340,5 +420,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'InterSemiBold',
         textAlign: 'center',
+    },
+    selectedImage: {
+        width: 100,
+        height: 100,
+        marginTop: 10,
+        borderRadius: 8,
     },
 });

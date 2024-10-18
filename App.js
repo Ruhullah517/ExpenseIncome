@@ -8,6 +8,7 @@ import CustomSplashScreen from './components/CustomSplashScreen';
 import CommonStackNavigator from './components/CommonNavigator';
 import AuthScreen from './screens/authScreen';
 import Home from './screens/Home';
+import { UserProvider } from './components/context';
 
 const Stack = createStackNavigator();
 
@@ -46,22 +47,24 @@ export default function App() {
   return (
     <>
       <StatusBar translucent backgroundColor="transparent" />
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* Render different screens based on login status */}
-          {!isLoggedIn ? <>
-            <Stack.Screen name="OnBoarding" component={OnBoarding} />
-            <Stack.Screen name='AuthScreen' component={AuthScreen} />
-            <Stack.Screen name="MainApp" component={CommonStackNavigator} />
-          </>
-            :
-            <>
+      <UserProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {/* Render different screens based on login status */}
+            {isLoggedIn ? <>
               <Stack.Screen name="MainApp" component={CommonStackNavigator} />
               <Stack.Screen name='AuthScreen' component={AuthScreen} />
             </>
-          }
-        </Stack.Navigator>
-      </NavigationContainer>
+              :
+              <>
+                <Stack.Screen name="OnBoarding" component={OnBoarding} />
+                <Stack.Screen name='AuthScreen' component={AuthScreen} />
+                <Stack.Screen name="MainApp" component={CommonStackNavigator} />
+              </>
+            }
+          </Stack.Navigator>
+        </NavigationContainer>
+      </UserProvider>
     </>
   );
 }

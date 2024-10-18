@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, Dimensions, BackHandler, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ellipse9 from '../assets/Ellipse 9.svg';
@@ -7,17 +7,14 @@ import Ellipse7 from '../assets/Ellipse 7.svg';
 import HomeHeader from '../components/HomeHeader';
 import HomeTransactionHistory from '../components/HomeTransactionHistory';
 import SendAgainSection from '../components/SendAgainSection';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from "jwt-decode";
 import { useFocusEffect } from '@react-navigation/native';
+import { UserContext } from '../components/context';
 
 // Get device dimensions for responsive design
 const { height: windowHeight } = Dimensions.get('window');
 
 const Home = () => {
-  const [userName, setUserName] = useState('');
-
+  const { currentUser } = useContext(UserContext);
   const handleBackPress = () => {
     Alert.alert(
       'Exit App',
@@ -41,32 +38,6 @@ const Home = () => {
       }
     }))
 
-  useEffect(() => {
-    fetchUserDetails();
-
-  }, []);
-
-  const fetchUserDetails = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      console.log("Token found:", token);  // Debugging log
-
-      if (token) {
-        const decoded = jwtDecode(token);  // Ensure jwtDecode is working correctly
-        const userId = decoded.id;
-        console.log("Decoded userId:", userId);  // Debugging log
-
-        const response = await axios.get(`http://192.168.137.1:3000/users/${userId}`);
-        console.log("User data fetched:", response.data);  // Debugging log
-
-        setUserName(response.data.name);
-      } else {
-        console.log('No token found in storage');
-      }
-    } catch (error) {
-      console.error('Error fetching user details:', error);
-    }
-  };
   // Render header with gradient and SVG ellipses
   const renderHeader = () => (
     <View>
@@ -82,7 +53,7 @@ const Home = () => {
         <Ellipse7 style={styles.ellipse7} />
 
         <View style={styles.content}>
-          <HomeHeader userName={userName} />
+          <HomeHeader userName={currentUser.name} />
         </View>
       </LinearGradient>
     </View>
