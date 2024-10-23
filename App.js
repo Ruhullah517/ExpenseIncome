@@ -35,11 +35,10 @@ export default function App() {
     const timeoutId = setTimeout(() => {
       setIsSplashScreen(false);
       checkToken();
-
     }, 2500);
 
     return () => clearTimeout(timeoutId);  // Cleanup function to clear the timeout
-  }, []);
+  }, [isLoggedIn]);
 
   if (isSplashScreen) {
     return <CustomSplashScreen />;

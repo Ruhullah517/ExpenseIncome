@@ -14,7 +14,6 @@ import { UserContext } from '../components/context';
 const { height: windowHeight } = Dimensions.get('window');
 
 const Home = () => {
-  const { currentUser } = useContext(UserContext);
   const handleBackPress = () => {
     Alert.alert(
       'Exit App',
@@ -53,7 +52,7 @@ const Home = () => {
         <Ellipse7 style={styles.ellipse7} />
 
         <View style={styles.content}>
-          <HomeHeader userName={currentUser.name} />
+          <HomeHeader />
         </View>
       </LinearGradient>
     </View>

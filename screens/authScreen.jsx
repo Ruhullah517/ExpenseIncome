@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, BackHandler } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../components/context';
 
 export default function AuthScreen() {
     const [isLogin, setIsLogin] = useState(true);
@@ -11,7 +12,7 @@ export default function AuthScreen() {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const navigation = useNavigation();
-    console.log(navigation.getState().routes);
+    const { fetchUserDetails } = useContext(UserContext);
 
 
     const handleBackPress = () => {
@@ -62,27 +63,25 @@ export default function AuthScreen() {
             });
     };
 
-    const handleLogin = () => {
-        axios.post('http://192.168.137.1:3000/login', { email, password })
-            .then(async response => {
-                console.log('Login response:', response.data);
-                const { token } = response.data;
-                try {
-                    await AsyncStorage.setItem('token', token);  // Save token to AsyncStorage
-                    alert('User LoggedIn!');
-                    // Clear the form before navigating
-                    setEmail('');
-                    setPassword('');
-                    // Navigate to MainApp after clearing the form
-                    navigation.navigate('MainApp');
-                } catch (error) {
-                    console.error('Error saving token:', error);
-                }
-            })
-            .catch(error => {
-                console.error('Login error:', error); // Log the exact error
-                alert('Error logging in user');
-            });
+    const handleLogin = async () => {
+        try {
+            const response = await axios.post('http://192.168.137.1:3000/login', { email, password });
+            console.log('Login response:', response.data);
+            const { token } = response.data;
+
+            await AsyncStorage.setItem('token', token);  // Ensure token is saved to AsyncStorage
+            alert('User LoggedIn!');
+
+            // Clear the form before navigating
+            setEmail('');
+            setPassword('');
+            await fetchUserDetails()
+            // Now navigate to MainApp after token is saved
+            navigation.navigate('MainApp');
+        } catch (error) {
+            console.error('Login error:', error); // Log the exact error
+            alert('Error logging in user');
+        }
     };
 
 

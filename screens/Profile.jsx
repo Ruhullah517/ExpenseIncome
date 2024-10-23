@@ -16,9 +16,8 @@ import SecureIcon from '../assets/Icons/SecureIcon.svg';
 import LogoutIcon from '../assets/Icons/logout.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import { jwtDecode } from "jwt-decode";
-import { useEffect, useState } from 'react';
+import { useContext} from 'react';
+import { UserContext } from '../components/context';
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 
@@ -45,7 +44,8 @@ const MenuItem = ({ icon, title, onPress }) => (
 );
 
 const Profile = () => {
-    const [userName, setUserName] = useState('');
+  
+    const { currentUser } = useContext(UserContext);
     const navigation = useNavigation();
 
     const [loaded] = useFonts({
@@ -74,31 +74,7 @@ const Profile = () => {
         }
     };
 
-    useEffect(() => {
-        fetchUserDetails();
-    }, []);
 
-    const fetchUserDetails = async () => {
-        try {
-            const token = await AsyncStorage.getItem('token');
-            console.log("Token found:", token);  // Debugging log
-
-            if (token) {
-                const decoded = jwtDecode(token);  // Ensure jwtDecode is working correctly
-                const userId = decoded.id;
-                console.log("Decoded userId:", userId);  // Debugging log
-
-                const response = await axios.get(`http://192.168.137.1:3000/users/${userId}`);
-                console.log("User data fetched:", response.data);  // Debugging log
-
-                setUserName(response.data.name);
-            } else {
-                console.log('No token found in storage');
-            }
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-        }
-    };
     const menuData = [
         {
             title: "Invite Friends",
@@ -188,8 +164,8 @@ const Profile = () => {
                     </View>
                 </LinearGradient>
                 <View style={styles.nameContainer}>
-                    <Text style={styles.name}>{userName}</Text>
-                    <Text style={styles.username}>@{userName}</Text>
+                    <Text style={styles.name}>{currentUser.name}</Text>
+                    <Text style={styles.username}>@{currentUser.name}</Text>
                 </View>
                 <View style={styles.menuSection}>
                     {menuData.map((item, index) => (

@@ -15,7 +15,7 @@ import { UserContext } from '../components/context';
 const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
 
 export default function AddExpense() {
-    const { currentUser } = useContext(UserContext);
+    const { currentUser, currentAccount } = useContext(UserContext);
     const [date, setDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
     const [amount, setAmount] = useState(''); // State to track the amount
@@ -52,8 +52,9 @@ export default function AddExpense() {
         // Format the date to 'YYYY-MM-DD' string before appending
         const formattedDate = date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
         formData.append('date', formattedDate);
-        formData.append('type', 'expense'); 
-        formData.append('created_by', currentUser.userId);  
+        formData.append('type', 'expense');
+        formData.append('created_by', currentUser.userId);
+        formData.append('account_id', currentAccount.id)
         // Get the file extension from the selected image URI
         const fileType = selectedImage.split('.').pop(); // Extracts the file extension (either jpg or png)
         // Set the MIME type dynamically based on the file type

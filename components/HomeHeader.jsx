@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SvgUri } from 'react-native-svg'; // Adjust based on your SVG usage
 
 import NotifyIcon from '../assets/Icons/NotifyIcon.svg';
@@ -7,9 +7,12 @@ import HalfCircle from '../assets/Icons/Halfcircle.svg';
 import { useFonts } from 'expo-font';
 import FinancialCard from './FinancialCard';
 import axios from 'axios';
+import { UserContext } from './context';
 
 
-export default function HomeHeader({userName}) {
+export default function HomeHeader() {
+  const { currentUser } = useContext(UserContext);
+
 
     const [loaded] = useFonts({
         InterMedium: require('../assets/fonts/Inter 24pt Medium.ttf'),
@@ -20,11 +23,16 @@ export default function HomeHeader({userName}) {
     if (!loaded) {
         return <View><Text>Loading...</Text></View>;
     }
+    if(!currentUser.name){
+        return <View style={[styles.container, styles.horizontal]}>
+            <ActivityIndicator size="large" />
+        </View>
+    }
     return (<>
         <View style={styles.header}>
             <View style={styles.textContainer}>
                 <Text style={styles.greeting}>Good afternoon,</Text>
-                <Text style={styles.name}>{userName}</Text>
+                <Text style={styles.name}>{currentUser.name}</Text>
             </View>
             <View style={styles.iconContainer}>
                 <NotifyIcon />
