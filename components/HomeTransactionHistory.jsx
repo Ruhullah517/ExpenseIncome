@@ -59,7 +59,7 @@ export default function HomeTransactionHistory() {
   const fetchExpenses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://192.168.137.1:3000/accounts/${currentAccount.id}/expenses`);
+      const response = await axios.get(`https://expense-income-backend.vercel.app/accounts/${currentAccount.id}/expenses`);
       setExpenses(response.data);
       console.log("expenses : ", response.data);
 
