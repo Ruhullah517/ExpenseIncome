@@ -69,7 +69,7 @@ export default function AddExpense() {
         });
         console.log(formData);
         try {
-            const response = await axios.post('http://192.168.137.1:3000/add-expense', formData, {
+            const response = await axios.post('https://expense-income-backend.vercel.app/add-expense', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
