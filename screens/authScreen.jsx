@@ -48,7 +48,7 @@ export default function AuthScreen() {
         }
     };
     const handleSignup = () => {
-        axios.post('http://192.168.137.1:3000/signup', { email, password, name })
+        axios.post('https://expense-income-backend.vercel.app/signup', { email, password, name })
             .then(response => {
                 alert('User created!');
                 setIsLogin(true);
@@ -65,7 +65,7 @@ export default function AuthScreen() {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://192.168.137.1:3000/login', { email, password });
+            const response = await axios.post('https://expense-income-backend.vercel.app/login', { email, password });
             console.log('Login response:', response.data);
             const { token } = response.data;
 
