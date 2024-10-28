@@ -19,8 +19,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 1,  // Make sure to update this for every new build
-      "permissions": []  // Specify required permissions if any, or leave empty if none are needed
+      "versionCode": 1,  
+      "permissions": []  
     },
     "web": {
       "favicon": "./assets/favicon.png"
