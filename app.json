@@ -7,17 +7,20 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "backgroundColor": "#69AEA9"
+      "backgroundColor": "#69AEA9",
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ruhullah.expenseincome"
     },
     "android": {
+      "package": "com.ruhullah.ExpenseIncome",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ruhullah.ExpenseIncome"
+      "versionCode": 1,  // Make sure to update this for every new build
+      "permissions": []  // Specify required permissions if any, or leave empty if none are needed
     },
     "web": {
       "favicon": "./assets/favicon.png"
