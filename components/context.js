@@ -31,7 +31,7 @@ export const UserProvider = ({ children }) => {
                 const userId = decoded.id;
                 console.log("Decoded userId:", userId);  // Debugging log
 
-                const userResponse = await axios.get(`http://192.168.137.1:3000/users/${userId}`);
+                const userResponse = await axios.get(`https://expense-income-backend.vercel.app/users/${userId}`);
                 console.log("User data fetched:", userResponse.data.name);  // Debugging log
                 setCurrentUser({
                     userId: userId,          // userId from the decoded token
@@ -39,7 +39,7 @@ export const UserProvider = ({ children }) => {
                 });
 
                 // Fetch the user's current account
-                const accountResponse = await axios.get(`http://192.168.137.1:3000/accounts/current/${userId}`);
+                const accountResponse = await axios.get(`https://expense-income-backend.vercel.app/accounts/current/${userId}`);
                 console.log("Account fetched:", accountResponse.data[0]);
                 setCurrentAccount(accountResponse.data[0]); // Update currentAccount
             } else {
