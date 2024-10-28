@@ -37,7 +37,7 @@ const processExpenses = (expenses) => {
 
 const fetchExpenses = async (currentAccountId) => {
     try {
-        const response = await axios.get(`http://192.168.137.1:3000/accounts/${currentAccountId}/expenses`);
+        const response = await axios.get(`https://expense-income-backend.vercel.app/accounts/${currentAccountId}/expenses`);
         console.log("expenses : ", response.data);
 
     } catch (error) {
