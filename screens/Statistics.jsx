@@ -51,7 +51,7 @@ export default function StatisticsPage() {
   const fetchExpenses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://192.168.137.1:3000/accounts/${currentAccount.id}/expenses`);
+      const response = await axios.get(`https://expense-income-backend.vercel.app/accounts/${currentAccount.id}/expenses`);
 
       // Transform the expense data
       const transformedExpenses = response.data.map(expense => ({
@@ -59,7 +59,7 @@ export default function StatisticsPage() {
         name: expense.name,
         amount: parseFloat(expense.amount),
         date: new Date(expense.date),
-        logo: expense.image_path ? `http://192.168.137.1:3000${expense.image_path}` : null,
+        logo: expense.image_path ? `https://expense-income-backend.vercel.app${expense.image_path}` : null,
         type: expense.type, // Assuming 'expense' type is returned from the API
       }));
 
