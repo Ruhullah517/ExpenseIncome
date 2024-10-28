@@ -1,21 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import YoutubeIcon from '../assets/Icons/youtube.svg';
-import UpworkIcon from '../assets/Icons/upwork.svg';
-import PaypalIcon from '../assets/Icons/paypal.svg';
-import PersonIcon from '../assets/Icons/person.svg';
+
 import { useFonts } from 'expo-font';
 import { UserContext } from './context';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 
 
-// const transactions = [
-//   { id: '1', name: 'Upwork', date: 'Today', amount: 850, type: 'credit', icon: UpworkIcon },
-//   { id: '2', name: 'Transfer', date: 'Yesterday', amount: -85, type: 'debit', icon: PersonIcon },
-//   { id: '3', name: 'Paypal', date: 'Jan 30, 2022', amount: 1406, type: 'credit', icon: PaypalIcon },
-//   { id: '4', name: 'Youtube', date: 'Jan 16, 2022', amount: -11.99, type: 'debit', icon: YoutubeIcon },
-// ];
 const formatDate = (isoDateString) => {
   const date = new Date(isoDateString);
   return date.toLocaleDateString('en-US', {
@@ -87,7 +78,7 @@ export default function HomeTransactionHistory() {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
   if (!loading && expenses.length === 0) {
-    return <Text>No transactions available.</Text>;
+    return <Text style={styles.noItem}>No transactions available.</Text>;
   }
 
   return (
@@ -163,4 +154,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "InterSemiBold"
   },
+  noItem:{
+    justifyContent:'center',
+    fontSize:20,
+    marginTop:"40%",
+    alignItems:'center',
+    marginBottom:'40%',
+    textAlign:'center'
+  }
 });
